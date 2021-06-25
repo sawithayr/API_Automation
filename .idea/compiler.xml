@@ -6,11 +6,11 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="QAE_Shopee" />
+        <module name="Flip" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="QAE_Shopee" target="${maven.compiler.target}" />
+      <module name="Flip" target="${maven.compiler.target}" />
     </bytecodeTargetLevel>
   </component>
 </project>

@@ -17,9 +17,7 @@ import static io.restassured.RestAssured.given;
 
 public class PostGetPutDeleteSteps {
 
-
-    private static final String TOKEN = "26c2934debb54e5000fa6469d822e36565fc83cbf4feb2805444ef18644c50f1";
-    private static final String BASE_URI = "https://gorest.co.in/public-api";
+    private static final String BASE_URI = "https://reqres.in";
 
     RequestSpecification request;
     Response response;
@@ -29,9 +27,9 @@ public class PostGetPutDeleteSteps {
         RestAssured.baseURI = BASE_URI + url;
     }
 
-    @And("User authenticates the API request with token")
-    public void userAuthenticatesTheAPIRequestWithToken() {
-        request = given().auth().oauth2(TOKEN);
+    @Given("User sets the base API request")
+    public void userSetsTheBaseAPIRequest() {
+        RestAssured.baseURI = BASE_URI;
     }
 
     @When("User sends the API request to get all the list")
@@ -46,7 +44,7 @@ public class PostGetPutDeleteSteps {
 
     @And("User validates the response meta pagination {string} is {int}")
     public void userValidatesTheResponseMetaPaginationIs(String meta, int value) {
-        Assert.assertEquals(response.jsonPath().getInt("meta.pagination.'" + meta + "'"), value, "Something was wrong! Please check '" + meta + "'");
+        Assert.assertEquals(response.jsonPath().getInt(meta), value, "Something was wrong! Please check '" + meta + "'");
     }
 
     @And("User validates the list body response equals with {int}")
@@ -57,25 +55,30 @@ public class PostGetPutDeleteSteps {
         Assert.assertEquals(list, listData, "Something was wrong! Please check the list response");
     }
 
-    @When("User create new data user with POST request {string} and request body {string}, {string}, {string}, {string}")
-    public void userCreateNewDataUserWithPOSTRequestAndRequestBodyNameGenderEmailStatus(String url, String name, String gender, String email, String status) {
+    @When("User create new data user with POST request {string} and request body {string}, {string}")
+    public void userCreateNewDataUserWithPOSTRequestAndRequestBodyNameJob(String url, String name, String job) {
 
         JSONObject requestParams = new JSONObject();
 
         requestParams.put("name", name);
-        requestParams.put("gender", gender);
-        requestParams.put("email", email);
-        requestParams.put("status", status);
+        requestParams.put("job", job);
 
-        request = given().header("Authorization", "Bearer " + TOKEN).contentType(ContentType.JSON).with().body(requestParams);
-        request.body(requestParams.toJSONString());
-        response = request.post(BASE_URI + url);
+        request = RestAssured.given();
+        request.header("Content-Type", "application/json");
+        response = request.body(requestParams.toJSONString()).post(BASE_URI + url);
+
         response = request.get().then().log().all().extract().response();
     }
+
 
     @And("User validates id is not null")
     public void userValidatesIdIsNotNull() {
         Assert.assertTrue(response.jsonPath().get("data.id") != null, "'data.id'" + " is empty");
+    }
+
+    @And("User validates id is null")
+    public void userValidatesIdIsNull() {
+        Assert.assertFalse(response.jsonPath().get("data.id") != null, "'data.id'" + " is empty");
     }
 
     @And("User validates the body response with array name {string}")
@@ -98,13 +101,18 @@ public class PostGetPutDeleteSteps {
         Assert.assertEquals(response.body().jsonPath().get("data.status[0]"), status, "Something was wrong!");
     }
 
-    @And("User validates the body response with name {string}")
-    public void userValidatesTheBodyResponseWithName(String name) {
-        Assert.assertEquals(response.body().jsonPath().get("data.name"), name, "Something was wrong!");
+    @And("User validates the body response with first name {string}")
+    public void userValidatesTheBodyResponseWithFirstName(String name) {
+        Assert.assertEquals(response.body().jsonPath().get("data.first_name"), name, "Something was wrong!");
     }
 
-    @And("User validates the body response with gender {string}")
-    public void userValidatesTheBodyResponseWithGender(String gender) {
+    @And("User validates the body response with last name {string}")
+    public void userValidatesTheBodyResponseWithLastName(String name) {
+        Assert.assertEquals(response.body().jsonPath().get("data.last_name"), name, "Something was wrong!");
+    }
+
+    @And("User validates the body response with job {string}")
+    public void userValidatesTheBodyResponseWithJob(String gender) {
         Assert.assertEquals(response.body().jsonPath().get("data.gender"), gender, "Something was wrong!");
     }
 
@@ -125,38 +133,4 @@ public class PostGetPutDeleteSteps {
 
     }
 
-    @When("User create new data user with PUT request {string} and request body {string}, {string}, {string}, {string}")
-    public void userCreateNewDataUserWithPUTRequestAndRequestBody(String url, String name, String gender, String email, String status) {
-        JSONObject requestParams = new JSONObject();
-
-        requestParams.put("name", name);
-        requestParams.put("gender", gender);
-        requestParams.put("email", email);
-        requestParams.put("status", status);
-
-        request = given().header("Authorization", "Bearer " + TOKEN).contentType(ContentType.JSON).with().body(requestParams);
-        request.body(requestParams.toJSONString());
-        response = request.put(BASE_URI + url);
-        response = request.get().then().log().all().extract().response();
-    }
-
-    @When("User gets data user with DELETE request {string}")
-    public void userGetsDataUserWithDELETERequest(String url) {
-        JSONObject requestParams = new JSONObject();
-        request = given().header("Authorization", "Bearer " + TOKEN).contentType(ContentType.JSON).with().body(requestParams);
-        request.body(requestParams.toJSONString());
-        response = request.delete(BASE_URI + url);
-        response = request.get(BASE_URI + url).then().log().all().extract().response();
-
-    }
-
-    @And("User validates the body response with message {string}")
-    public void userValidatesTheBodyResponseWithMessage(String word) {
-        Assert.assertEquals(response.body().jsonPath().get("data.message"), word, "Something was wrong!");
-    }
-
-    @And("User validates the response code is {int}")
-    public void userValidatesTheResponseCodeIs(int code) {
-        Assert.assertEquals(response.body().jsonPath().getInt("code"), code, "Something was wrong!");
-    }
 }
