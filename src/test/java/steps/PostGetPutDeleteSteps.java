@@ -32,9 +32,9 @@ public class PostGetPutDeleteSteps {
         RestAssured.baseURI = BASE_URI;
     }
 
-    @When("User sends the API request to get all the list")
-    public void userSendsTheAPIRequestToGetAllTheList() {
-        response = request.get().then().log().all().extract().response();
+    @When("User sends the API request to get all the list {string}")
+    public void userSendsTheAPIRequestToGetAllTheList(String url) {
+        response = request.get(BASE_URI + url).then().log().all().extract().response();
     }
 
     @Then("User validates the response status is {int}")
@@ -65,40 +65,28 @@ public class PostGetPutDeleteSteps {
 
         request = RestAssured.given();
         request.header("Content-Type", "application/json");
-        response = request.body(requestParams.toJSONString()).post(BASE_URI + url);
-
-        response = request.get().then().log().all().extract().response();
+        response = request.body(requestParams.toJSONString()).post(BASE_URI + url).then().log().all().extract().response();
     }
 
 
+    @And("User validates data id is not null")
+    public void userValidatesDataIdIsNotNull() {
+        Assert.assertTrue(response.jsonPath().get("data.id") != null, "'data.id'" + " is empty");
+    }
+
     @And("User validates id is not null")
     public void userValidatesIdIsNotNull() {
-        Assert.assertTrue(response.jsonPath().get("data.id") != null, "'data.id'" + " is empty");
+        Assert.assertTrue(response.jsonPath().get("id") != null, "'data.id'" + " is empty");
     }
 
     @And("User validates id is null")
     public void userValidatesIdIsNull() {
-        Assert.assertFalse(response.jsonPath().get("data.id") != null, "'data.id'" + " is empty");
+        Assert.assertFalse(response.jsonPath().get("id") != null, "'id'" + " is empty");
     }
 
-    @And("User validates the body response with array name {string}")
-    public void userValidatesTheBodyResponseWithArrayName(String name) {
-        Assert.assertEquals(response.body().jsonPath().get("data.name[0]"), name, "Something was wrong!");
-    }
-
-    @And("User validates the body response with array gender {string}")
-    public void userValidatesTheBodyResponseWithArrayGender(String gender) {
-        Assert.assertEquals(response.body().jsonPath().get("data.gender[0]"), gender, "Something was wrong!");
-    }
-
-    @And("User validates the body response with array email {string}")
-    public void userValidatesTheBodyResponseWithArrayEmail(String email) {
-        Assert.assertEquals(response.body().jsonPath().get("data.email[0]"), email, "Something was wrong!");
-    }
-
-    @And("User validates the body response with array status {string}")
-    public void userValidatesTheBodyResponseWithArrayStatus(String status) {
-        Assert.assertEquals(response.body().jsonPath().get("data.status[0]"), status, "Something was wrong!");
+    @And("User validates the body response with name {string}")
+    public void userValidatesTheBodyResponseWithName(String name) {
+        Assert.assertEquals(response.body().jsonPath().get("name"), name, "Something was wrong!");
     }
 
     @And("User validates the body response with first name {string}")
@@ -112,18 +100,8 @@ public class PostGetPutDeleteSteps {
     }
 
     @And("User validates the body response with job {string}")
-    public void userValidatesTheBodyResponseWithJob(String gender) {
-        Assert.assertEquals(response.body().jsonPath().get("data.gender"), gender, "Something was wrong!");
-    }
-
-    @And("User validates the body response with email {string}")
-    public void userValidatesTheBodyResponseWithEmail(String email) {
-        Assert.assertEquals(response.body().jsonPath().get("data.email"), email, "Something was wrong!");
-    }
-
-    @And("User validates the body response with status {string}")
-    public void userValidatesTheBodyResponseWithStatus(String status) {
-        Assert.assertEquals(response.body().jsonPath().get("data.status"), status, "Something was wrong!");
+    public void userValidatesTheBodyResponseWithJob(String job) {
+        Assert.assertEquals(response.body().jsonPath().get("job"), job, "Something was wrong!");
     }
 
     @Given("User gets new data user with GET request {string} with id {string}")
